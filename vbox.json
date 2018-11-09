@@ -1,0 +1,50 @@
+{
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "mount -t iso9660 -o loop /root/VBoxGuestAdditions.iso /mnt",
+        "sh /mnt/VBoxLinuxAdditions.run",
+        "umount /mnt",
+        "rm -f /root/VBoxGuestAdditions.iso"
+      ]
+    }
+  ],
+  "builders": [
+    {
+      "name": "cent7",
+      "type": "virtualbox-iso",
+      "iso_url": "http://centos.mirrors.tds.net/pub/linux/centos/7.5.1804/isos/x86_64/CentOS-7-x86_64-Minimal-1804.iso",
+      "iso_checksum": "714acc0aefb32b7d51b515e25546835e55a90da9fb00417fbee2d03a62801efd",
+      "iso_checksum_type": "sha256",
+      "vm_name": "cent7",
+      "guest_os_type": "RedHat_64",
+      "headless": "true",
+      "ssh_username": "root",
+      "ssh_password": "vagrant",
+      "ssh_port": 22,
+      "ssh_wait_timeout": "200s",
+      "vboxmanage": [
+        ["modifyvm", "{{.Name}}", "--memory", "512"],
+        ["modifyvm", "{{.Name}}", "--cpus", "1"],
+        ["modifyvm", "{{.Name}}", "--audio", "none"],
+        ["modifyvm", "{{.Name}}", "--usb", "off"]
+      ],
+      "disk_size": "16384",
+      "http_directory": "http/CentOS",
+      "boot_wait": "30s",
+      "boot_command": [
+        "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks.cfg<enter><wait>"
+      ],
+      "shutdown_command": "/sbin/halt -p"
+    }
+  ],
+  "post-processors": [
+    [
+      {
+        "type": "vagrant",
+        "compression_level": 9
+      }
+    ]
+  ]
+}

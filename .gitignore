@@ -1,0 +1,13 @@
+Vagrantfile
+vendor/
+*.retry
+*.box
+.kitchen/
+*.swp
+Gemfile.lock
+*.pyc
+.bundle/
+packer_cache/
+output-*/
+.kitchen.local.yml
+*.iso
