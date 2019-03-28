@@ -7,12 +7,18 @@ import subprocess
 
 def build(name):
     """ Build virtualbox vagrant box image """
-    subprocess.run(["packer", "build", "-force", name])
+    try:
+        subprocess.run(["packer", "build", "-force", name])
+    except subprocess.CalledProcessError as err:
+        print('Error:', err)
 
 def add(name):
     """ Add vagrant box image to vagrant """
-    subprocess.run(["vagrant", "box", "add", "--force", "--name=" + name,
-                    "packer_cent7_virtualbox.box"])
+    try:
+        subprocess.run(["vagrant", "box", "add", "--force", "--name=" + name,
+                        "packer_cent7_virtualbox.box"])
+    except subprocess.CalledProcessError as err:
+        print('Error:', err)
 
 def main():
     """ Main function """
