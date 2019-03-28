@@ -9,20 +9,20 @@ def build(name):
     """ Build virtualbox vagrant box image """
     try:
         subprocess.run(["packer", "build", "-force", name])
-        return 0
+        return True
     except subprocess.CalledProcessError as err:
         print('Error:', err)
-        return 1
+        return False
 
 def add(name):
     """ Add vagrant box image to vagrant """
     try:
         subprocess.run(["vagrant", "box", "add", "--force", "--name=" + name,
                         "packer_cent7_virtualbox.box"])
-        return 0
+        return True
     except subprocess.CalledProcessError as err:
         print('Error:', err)
-        return 1
+        return False
 
 def main():
     """ Main function """
