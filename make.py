@@ -24,10 +24,20 @@ def add(name):
         print('Error: Vagrant box add failed, ', err)
         return 2
 
+def test():
+    """ Test with test-kitchen """
+    try:
+        subprocess.run(["kitchen", "test"])
+        return 0
+    except subprocess.CalledProcessError as err:
+        print('Error: Kitchen testing failed, ', err)
+        return 4
+
 def main():
     """ Main function """
     if build("vbox.json") == 0:
-        add("CentOS")
+        if add("CentOS") == 0:
+            test()
 
 if __name__ == "__main__":
     main()
