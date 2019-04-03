@@ -35,9 +35,13 @@ def test():
 
 def main():
     """ Main function """
-    if build("vbox.json") == 0:
-        if add("CentOS") == 0:
-            test()
+    build_result = build("vbox.json")
+    if build_result == 0:
+        add_result = add("CentOS")
+        if add_result == 0:
+            return test()
+        return add_result
+    return build_result
 
 if __name__ == "__main__":
-    main()
+    exit(main())
