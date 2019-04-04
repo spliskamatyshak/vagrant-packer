@@ -4,10 +4,13 @@ driver:
 
 provisioner:
   name: shell
-  require_chef_for_busser: false
 
 platforms:
   - name: CentOS
+
+verifier:
+  name: inspec
+  sudo: true
 
 suites:
   - name: default
