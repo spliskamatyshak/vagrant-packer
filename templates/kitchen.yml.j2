@@ -1,0 +1,16 @@
+---
+driver:
+  name: vagrant
+
+provisioner:
+  name: shell
+
+platforms:
+  - name: {{ box_name }}
+
+verifier:
+  name: inspec
+  sudo: true
+
+suites:
+  - name: default
