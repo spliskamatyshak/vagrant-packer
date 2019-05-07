@@ -12,12 +12,12 @@
   ],
   "builders": [
     {
-      "name": "{{ builder.name }}",
+      "name": "{{ data.builder.name }}",
       "type": "virtualbox-iso",
-      "iso_url": "{{ builder.iso_url }}",
-      "iso_checksum": "{{ builder.iso_checksum }}",
-      "iso_checksum_type": "{{ builder.iso_checksum_type }}",
-      "vm_name": "{{ builder.name }}",
+      "iso_url": "{{ data.builder.iso_url }}",
+      "iso_checksum": "{{ data.builder.iso_checksum }}",
+      "iso_checksum_type": "{{ data.builder.iso_checksum_type }}",
+      "vm_name": "{{ data.builder.name }}",
       "guest_os_type": "RedHat_64",
       "headless": "true",
       "ssh_username": "root",
@@ -25,15 +25,19 @@
       "ssh_port": 22,
       "ssh_wait_timeout": "1200s",
       "vboxmanage": [
+{% raw -%}
         ["modifyvm", "{{.Name}}", "--memory", "512"],
         ["modifyvm", "{{.Name}}", "--cpus", "1"],
         ["modifyvm", "{{.Name}}", "--audio", "none"],
         ["modifyvm", "{{.Name}}", "--usb", "off"]
+{% endraw -%}
       ],
       "disk_size": "16384",
       "http_directory": ".",
       "boot_command": [
+{% raw -%}
         "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks.cfg<enter><wait>"
+{% endraw -%}
       ],
       "shutdown_command": "/sbin/halt -p"
     }
