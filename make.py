@@ -6,7 +6,7 @@ Usage:
     make.py [-hd]
     make.py [-pd] --interactive
     make.py [-pd] --config-json=CONFIG_JSON
-    make.py [-pd] --builder-name NAME --box-name=BOX --media=ISO
+    make.py [-pd] [--builder-name=NAME --box-name=BOX --media=ISO]
             [(--check-sum=CHECK_SUM --check-sum-type=CHECK_SUM_TYPE)]
             [(--proxy=PROXY [--user-name=PROXY_USERNAME --password=PROXY_PASSWORD])]
 
@@ -21,7 +21,7 @@ Options:
     -m ISO --media=ISO                                 URL to ISO.
     -k CHECK_SUM --check-sum=CHECK_SUM                 Check sum for ISO.
     -t CHECK_SUM_TYPE --check-sum-type=CHECK_SUM_TYPE  Check sum type.
-    -x PROXY --proxy PROXY                             Proxy, if needed.
+    -x PROXY --proxy=PROXY                             Proxy, if needed.
     -u PROXY_USERNAME --user-name=PROXY_USERNAME       Proxy username, if needed.
     -s PROXY_PASSWORD --password=PROXY_PASSWORD        Proxy password, if needed.
 
@@ -31,7 +31,6 @@ import subprocess
 import json
 import sys
 import jinja2
-import yaml
 from docopt import docopt
 
 class VagrantBox():
@@ -57,37 +56,56 @@ class VagrantBox():
 
     def compile_data(self):
         """ Take data from arguments and create json object """
+        if self.args["--builder-name"]:
+            self.build_data["builder"]["name"] = self.args["--builder-name"]
+        if self.args["--media"]:
+            self.build_data["builder"]["iso_url"] = self.args["--media"]
+        if self.args["--check-sum"]:
+            self.build_data["builder"]["iso_checksum"] = self.args["--check-sum"]
+        if self.args["--check-sum-type"]:
+            self.build_data["builder"]["iso_checksum_type"] = self.args["--check-sum-type"]
+        if self.args["--box-name"]:
+            self.build_data["box_name"] = self.args["--box-name"]
+        if self.args["--proxy"]:
+            self.build_data["proxy"] = self.args["--proxy"]
+        if self.args["--user-name"]:
+            self.build_data["proxy_username"] = self.args["--user-name"]
+        if self.args["--password"]:
+            self.build_data["proxy_password"] = self.args["--password"]
 
     def make_data(self):
         """ Pull the data together into a json object """
         if self.args["--config-json"]:
             with open(self.args["--config-json"], "r") as json_file:
-                build_data = json.load(json_file)
+                self.build_data = json.load(json_file)
         elif self.args["--interactive"]:
             self.collect_data()
         self.compile_data()
 
         if self.args["--print-config"]:
-            print(build_data)
+            print(self.build_data)
 
     def get_data(self):
         """ Retrives build_data """
-        return json.dumps(self.build_data)
+        return self.build_data
 
-def craft_files(data):
+def craft_files(debug, data):
     """ Create files for build, add and test of box """
     print("Crafting files...")
+    if debug:
+        print(data)
 
-    env = jinja2.Environment(loader=jinja2.FileSystemLoader('templates/'))
-    template = env.get_template('ks.cfg.j2')
+    env = jinja2.Environment(loader=jinja2.FileSystemLoader("templates/"))
+
+    template = env.get_template("ks.cfg.j2")
     with open("ks.cfg", "w") as config_file:
         print(template.render(data=data), file=config_file)
 
-    template = env.get_template('vbox.json.j2')
+    template = env.get_template("vbox.json.j2")
     with open("vbox.json", "w") as config_file:
         print(template.render(data=data), file=config_file)
 
-    template = env.get_template('kitchen.yml.j2')
+    template = env.get_template("kitchen.yml.j2")
     with open(".kitchen.yml", "w") as config_file:
         print(template.render(data=data), file=config_file)
 
@@ -124,8 +142,10 @@ def main(args):
     new_box_data = VagrantBox(args)
     new_box_data.make_data()
     json_data = new_box_data.get_data()
+    if args["--debug"]:
+        print(json_data)
 
-    craft_files(json_data)
+    craft_files(args["--debug"], json_data)
 
     result = build_box()
     if result == 0:

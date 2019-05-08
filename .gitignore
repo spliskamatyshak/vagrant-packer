@@ -12,3 +12,5 @@ output-*/
 .kitchen.local.yml
 *.iso
 .vagrant/
+ks.cfg
+vbox.json
