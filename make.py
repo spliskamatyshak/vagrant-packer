@@ -8,7 +8,7 @@ Usage:
     make.py [-pd] --config-json=CONFIG_JSON
     make.py [-pd] [--builder-name=NAME --box-name=BOX --media=ISO]
             [(--check-sum=CHECK_SUM --check-sum-type=CHECK_SUM_TYPE)]
-            [(--proxy=PROXY [--user-name=PROXY_USERNAME --password=PROXY_PASSWORD])]
+            [(--proxy=PROXY [--user-name=PROXY_USERNAME --password)]
 
 Options:
     -h --help                                          Show this screen.
@@ -21,15 +21,16 @@ Options:
     -m ISO --media=ISO                                 URL to ISO.
     -k CHECK_SUM --check-sum=CHECK_SUM                 Check sum for ISO.
     -t CHECK_SUM_TYPE --check-sum-type=CHECK_SUM_TYPE  Check sum type.
-    -x PROXY --proxy=PROXY                             Proxy, if needed.
+    -x PROXY --proxy=PROXY                             Proxy, with port, if needed.
     -u PROXY_USERNAME --user-name=PROXY_USERNAME       Proxy username, if needed.
-    -s PROXY_PASSWORD --password=PROXY_PASSWORD        Proxy password, if needed.
+    -s --password                                      Proxy password, if needed.
 
 """
 
 import subprocess
 import json
 import sys
+import getpass
 import jinja2
 from docopt import docopt
 
@@ -53,6 +54,37 @@ class VagrantBox():
 
     def collect_data(self):
         """ Collect data interactively from user """
+        ans1 = input("Enter builder name [{}]: ".format(self.build_data["builder"]["name"]))
+        if ans1 != "":
+            self.build_data["builder"]["name"] = ans1
+
+        ans2 = input("Enter ISO url [{}]: ".format(self.build_data["builder"]["iso_url"]))
+        if ans2 != "":
+            self.build_data["builder"]["iso_url"] = ans2
+
+        ans3 = input("Enter ISO checksum [{}]: ".format(self.build_data["builder"]["iso_checksum"]))
+        if ans3 != "":
+            self.build_data["builder"]["iso_checksum"] = ans3
+
+        ans4 = input("Enter ISO checksum type [{}]: ".format(self.build_data["builder"]["iso_checksum_type"]))
+        if ans4 != "":
+            self.build_data["builder"]["iso_checksum_type"] = ans4
+
+        ans5 = input("Enter Vagrant box name [{}]: ".format(self.build_data["box_name"]))
+        if ans5 != "":
+            self.build_data["box_name"] = ans5
+
+        ans6 = input("Enter proxy, i.e. http(s)://proxy.domain.com:port: ")
+        if ans6 != "":
+            self.build_data["proxy"] = ans6
+
+        ans7 = input("Enter proxy user name: ")
+        if ans7 != "":
+            self.build_data["proxy_username"] = ans7
+
+        ans8 = getpass.getpass(prompt="Enter proxy password: ")
+        if ans8 != "":
+            self.build_data["proxy_password"] = ans8
 
     def compile_data(self):
         """ Take data from arguments and create json object """
@@ -71,7 +103,7 @@ class VagrantBox():
         if self.args["--user-name"]:
             self.build_data["proxy_username"] = self.args["--user-name"]
         if self.args["--password"]:
-            self.build_data["proxy_password"] = self.args["--password"]
+            self.build_data["proxy_password"] = getpass.getpass(prompt="Enter password: ")
 
     def make_data(self):
         """ Pull the data together into a json object """
