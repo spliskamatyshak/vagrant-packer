@@ -8,7 +8,7 @@ end
     
 describe pip('pip') do
   it { should be_installed }
-  its('version') { should eq '19.0.3' }
+  its('version') { should cmp >= '19.1.1' }
 end
     
 describe pip('ansible') do
