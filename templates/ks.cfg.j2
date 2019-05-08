@@ -48,9 +48,13 @@ proxy={{ data.proxy }}
 proxy_username={{ data.proxy_username }}
 proxy_password={{ data.proxy_password }}
 EOY
-
 {%- endif %}
+
 yum -y update
+yum -y install epel-release
+yum -y install python-pip
+pip install --upgrade pip
+pip install ansible
 yum clean all
 {% if data.proxy|length -%}
 

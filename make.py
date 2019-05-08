@@ -8,7 +8,7 @@ Usage:
     make.py [-pd] --config-json=CONFIG_JSON
     make.py [-pd] [--builder-name=NAME --box-name=BOX --media=ISO]
             [(--check-sum=CHECK_SUM --check-sum-type=CHECK_SUM_TYPE)]
-            [(--proxy=PROXY [--user-name=PROXY_USERNAME --password)]
+            [(--proxy=PROXY [--user-name=PROXY_USERNAME --password])]
 
 Options:
     -h --help                                          Show this screen.
