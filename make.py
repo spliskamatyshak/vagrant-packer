@@ -163,6 +163,7 @@ def add_box(box, name):
 def test_box():
     """ Test with test-kitchen """
     try:
+        subprocess.run(["bundle", "install", "--path", "vendor/bundle"])
         subprocess.run(["kitchen", "test"])
         return 0
     except subprocess.CalledProcessError as err:
