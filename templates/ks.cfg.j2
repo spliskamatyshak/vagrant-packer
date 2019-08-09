@@ -50,12 +50,14 @@ proxy_password={{ data.proxy_password }}
 EOY
 {%- endif %}
 
+{% if 'rhel' not in data.builder.iso_url -%}
 yum -y update
 yum -y install epel-release
 yum -y install python-pip
 pip install --upgrade pip
 pip install ansible
 yum clean all
+{%- endif %}
 {% if data.proxy|length -%}
 
 sed -i '/^proxy/d' /etc/yum.conf
@@ -63,7 +65,11 @@ sed -i '/^proxy/d' /etc/yum.conf
 %end
 
 %packages
+{% if 'rhel-8' in data.builder.iso_url -%}
+@^minimal-environment
+{% else -%}
 @^minimal
+{%- endif %}
 @core
 @development
 

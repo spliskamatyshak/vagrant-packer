@@ -13,5 +13,5 @@ end
     
 describe pip('ansible') do
   it { should be_installed }
-  its('version') { should eq '2.7.10' }
+  its('version') { should cmp >= '2.7.10' }
 end
