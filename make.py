@@ -8,6 +8,7 @@ Usage:
     make.py [-pd] --config-json=CONFIG_JSON
     make.py [-pd] [--builder-name=NAME --box-name=BOX --media=ISO]
             [(--check-sum=CHECK_SUM --check-sum-type=CHECK_SUM_TYPE)]
+            [--memory=MEMORY --disk-size=DISK_SIZE]
             [(--proxy=PROXY [--user-name=PROXY_USERNAME --password])]
 
 Options:
@@ -21,6 +22,8 @@ Options:
     -m ISO --media=ISO                                 URL to ISO.
     -k CHECK_SUM --check-sum=CHECK_SUM                 Check sum for ISO.
     -t CHECK_SUM_TYPE --check-sum-type=CHECK_SUM_TYPE  Check sum type.
+    -y MEMORY --memory=MEMORY                          Amount in megabytes.
+    -z DISK_SIZE --disk-size=DISK_SIZE                 Size of boot disk in megabytes.
     -x PROXY --proxy=PROXY                             Proxy, with port, if needed.
     -u PROXY_USERNAME --user-name=PROXY_USERNAME       Proxy username, if needed.
     -s --password                                      Proxy password, if needed.
@@ -44,7 +47,9 @@ class VagrantBox():
                 "name": "cent7",
                 "iso_url": "http://centos.mirrors.tds.net/pub/linux/centos/7.6.1810/isos/x86_64/CentOS-7-x86_64-DVD-1810.iso",
                 "iso_checksum": "6d44331cc4f6c506c7bbe9feb8468fad6c51a88ca1393ca6b8b486ea04bec3c1",
-                "iso_checksum_type": "sha256"
+                "iso_checksum_type": "sha256",
+                "memory": "512",
+                "disksize": "16384"
                 },
             "box_name": "CentOS",
             "proxy": "",
@@ -74,17 +79,25 @@ class VagrantBox():
         if ans5 != "":
             self.build_data["box_name"] = ans5
 
-        ans6 = input("Enter proxy, i.e. http(s)://proxy.domain.com:port: ")
+        ans6 = input("Enter desired amount of memory(MB) [{}]: ".format(self.build_data["builder"]["memory"]))
         if ans6 != "":
-            self.build_data["proxy"] = ans6
+            self.build_data["builder"]["memory"] = ans6
 
-        ans7 = input("Enter proxy user name: ")
+        ans7 = input("Enter desired amount of disk(MB) [{}]: ".format(self.build_data["builder"]["disksize"]))
         if ans7 != "":
-            self.build_data["proxy_username"] = ans7
+            self.build_data["builder"]["disksize"] = ans7
 
-        ans8 = getpass.getpass(prompt="Enter proxy password: ")
+        ans8 = input("Enter proxy, i.e. http(s)://proxy.domain.com:port: ")
         if ans8 != "":
-            self.build_data["proxy_password"] = ans8
+            self.build_data["proxy"] = ans8
+
+        ans9 = input("Enter proxy user name: ")
+        if ans9 != "":
+            self.build_data["proxy_username"] = ans9
+
+        ans10 = getpass.getpass(prompt="Enter proxy password: ")
+        if ans10 != "":
+            self.build_data["proxy_password"] = ans10
 
     def compile_data(self):
         """ Take data from arguments and create json object """
@@ -98,6 +111,10 @@ class VagrantBox():
             self.build_data["builder"]["iso_checksum_type"] = self.args["--check-sum-type"]
         if self.args["--box-name"]:
             self.build_data["box_name"] = self.args["--box-name"]
+        if self.args["--memory"]:
+            self.build_data["builder"]["memory"] = self.args["--memory"]
+        if self.args["--disk-size"]:
+            self.build_data["builder"]["disksize"] = self.args["--disk-size"]
         if self.args["--proxy"]:
             self.build_data["proxy"] = self.args["--proxy"]
         if self.args["--user-name"]:
@@ -144,7 +161,7 @@ def craft_files(debug, data):
 def build_box():
     """ Build virtualbox vagrant box image """
     try:
-        subprocess.run(["packer", "build", "-force", "vbox.json"])
+        subprocess.run(["packer", "build", "-force", "vbox.json"], check=True)
         return 0
     except subprocess.CalledProcessError as err:
         print("Error: Packer failed, {}", err)
@@ -154,7 +171,7 @@ def add_box(box, name):
     """ Add vagrant box image to vagrant """
     try:
         subprocess.run(["vagrant", "box", "add", "--force", "--name=" + name,
-                        "packer_" + box + "_virtualbox.box"])
+                        "packer_" + box + "_virtualbox.box"], check=True)
         return 0
     except subprocess.CalledProcessError as err:
         print("Error: Vagrant box add failed, {}", err)
@@ -163,8 +180,8 @@ def add_box(box, name):
 def test_box():
     """ Test with test-kitchen """
     try:
-        subprocess.run(["bundle", "install", "--path", "vendor/bundle"])
-        subprocess.run(["kitchen", "test"])
+        subprocess.run(["bundle", "install", "--path", "vendor/bundle"], check=True)
+        subprocess.run(["kitchen", "test"], check=True)
         return 0
     except subprocess.CalledProcessError as err:
         print("Error: Kitchen testing failed, {}", err)
