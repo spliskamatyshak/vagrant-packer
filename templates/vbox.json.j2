@@ -7,7 +7,9 @@
         "mount -t iso9660 -o loop /root/VBoxGuestAdditions.iso /mnt",
         "sh /mnt/VBoxLinuxAdditions.run",
         "umount /mnt",
-        "rm -f /root/VBoxGuestAdditions.iso"
+        "rm -f /root/VBoxGuestAdditions.iso",
+        "sed -i '/^proxy/d' /root/anaconda-ks.cfg",
+        "sed -i '/^proxy/d' /root/original-ks.cfg"
       ]
     }
   ],
