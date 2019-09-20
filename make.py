@@ -45,8 +45,8 @@ class VagrantBox():
         self.build_data = {
             "builder": {
                 "name": "cent7",
-                "iso_url": "http://centos.mirrors.tds.net/pub/linux/centos/7.6.1810/isos/x86_64/CentOS-7-x86_64-DVD-1810.iso",
-                "iso_checksum": "6d44331cc4f6c506c7bbe9feb8468fad6c51a88ca1393ca6b8b486ea04bec3c1",
+                "iso_url": "http://centos.mirrors.tds.net/pub/linux/centos/7.7.1908/isos/x86_64/CentOS-7-x86_64-DVD-1908.iso",
+                "iso_checksum": "9bba3da2876cb9fcf6c28fb636bcbd01832fe6d84cd7445fa58e44e569b3b4fe",
                 "iso_checksum_type": "sha256",
                 "memory": "512",
                 "disksize": "16384"
