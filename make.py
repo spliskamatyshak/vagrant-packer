@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """
 Program to build vagrant box and add to vagrant boxes list
 
@@ -161,7 +161,7 @@ def craft_files(debug, data):
 def build_box():
     """ Build virtualbox vagrant box image """
     try:
-        subprocess.run(["packer", "build", "-force", "vbox.json"], check=True)
+        subprocess.run(["packer", "build", "-color=false", "-force", "vbox.json"], check=True)
         return 0
     except subprocess.CalledProcessError as err:
         print("Error: Packer failed, {}", err)

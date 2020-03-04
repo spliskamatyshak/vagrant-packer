@@ -1,5 +1,5 @@
 {
-{%- if 'rhel' not in data.builder.iso_url -%}
+{%- if 'rhel' not in data.builder.iso_url %}
   "provisioners": [
     {
       "type": "shell",
@@ -29,19 +29,19 @@
       "ssh_port": 22,
       "ssh_wait_timeout": "1200s",
       "vboxmanage": [
-{% raw -%}
+{%- raw %}
         ["modifyvm", "{{.Name}}", "--memory", "{% endraw %}{{data.builder.memory}}{% raw %}"],
         ["modifyvm", "{{.Name}}", "--cpus", "1"],
         ["modifyvm", "{{.Name}}", "--audio", "none"],
         ["modifyvm", "{{.Name}}", "--usb", "off"]
-{% endraw -%}
+{%- endraw %}
       ],
       "disk_size": "{{data.builder.disksize}}",
       "http_directory": ".",
       "boot_command": [
-{% raw -%}
+{%- raw %}
         "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks.cfg<enter><wait>"
-{% endraw -%}
+{%- endraw %}
       ],
       "shutdown_command": "/sbin/halt -p"
     }
